@@ -27,7 +27,7 @@ def view_mock_interviews(user_id):
     cursor = conn.cursor()
     cursor.execute(
         "SELECT mock_id, mock_date, score, feedback "
-        "FROM Mock_Interviews WHERE user_id = ?",
+        "FROM Mock_Interviews WHERE user_id = ? ORDER BY mock_id",
         (user_id,)
     )
     rows = cursor.fetchall()
@@ -40,6 +40,23 @@ def view_mock_interviews(user_id):
     cursor.close()
     conn.close()
 
+def delete_mock_interview(mock_id):
+    """Deletes a mock interview record by its ID."""
+    conn = get_connection()
+    if conn is None:
+        return
+
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Mock_Interviews WHERE mock_id = ?", (mock_id,))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        print(f"No mock interview found with ID {mock_id}.")
+    else:
+        print(f"Mock interview ID {mock_id} deleted successfully.")
+
+    cursor.close()
+    conn.close()
 
 # Quick test
 if __name__ == "__main__":

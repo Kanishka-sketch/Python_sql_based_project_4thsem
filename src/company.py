@@ -49,7 +49,7 @@ def view_companies(user_id):
     cursor = conn.cursor()
     cursor.execute(
         "SELECT company_id, company_name, status, notes "
-        "FROM Companies WHERE user_id = ?",
+        "FROM Companies WHERE user_id = ? ORDER BY company_id",
         (user_id,)
     )
     rows = cursor.fetchall()
@@ -62,6 +62,23 @@ def view_companies(user_id):
     cursor.close()
     conn.close()
 
+def delete_company(company_id):
+    """Deletes a company record by its ID."""
+    conn = get_connection()
+    if conn is None:
+        return
+
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Companies WHERE company_id = ?", (company_id,))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        print(f"No company found with ID {company_id}.")
+    else:
+        print(f"Company ID {company_id} deleted successfully.")
+
+    cursor.close()
+    conn.close()
 
 # Quick test
 if __name__ == "__main__":

@@ -49,7 +49,7 @@ def view_topics(user_id):
     cursor = conn.cursor()
     cursor.execute(
         "SELECT sql_id, topic, difficulty, practice_date, status "
-        "FROM SQL_Practice WHERE user_id = ?",
+        "FROM SQL_Practice WHERE user_id = ? ORDER BY sql_id",
         (user_id,)
     )
     rows = cursor.fetchall()
@@ -63,7 +63,24 @@ def view_topics(user_id):
     cursor.close()
     conn.close()
 
+def delete_topic(sql_id):
+    """Deletes a SQL practice topic by its ID."""
+    conn = get_connection()
+    if conn is None:
+        return
 
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM SQL_Practice WHERE sql_id = ?", (sql_id,))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        print(f"No topic found with ID {sql_id}.")
+    else:
+        print(f"Topic ID {sql_id} deleted successfully.")
+
+    cursor.close()
+    conn.close()
+    
 # Quick test
 if __name__ == "__main__":
     view_topics(1)

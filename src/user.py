@@ -24,7 +24,7 @@ def view_users():
         return
 
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id, name, email, college FROM Users")
+    cursor.execute("SELECT user_id, name, email, college FROM Users ORDER BY user_id")
     rows = cursor.fetchall()
 
     print("\n--- Users ---")

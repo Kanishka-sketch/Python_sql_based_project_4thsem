@@ -27,7 +27,7 @@ def view_problems(user_id):
     cursor = conn.cursor()
     cursor.execute(
         "SELECT problem_id, problem_name, difficulty, topic, platform, date_solved "
-        "FROM DSA_Problems WHERE user_id = ?",
+        "FROM DSA_Problems WHERE user_id = ? ORDER BY problem_id",
         (user_id,)
     )
     rows = cursor.fetchall()
