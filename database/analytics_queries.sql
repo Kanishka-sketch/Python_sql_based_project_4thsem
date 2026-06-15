@@ -20,3 +20,8 @@ FROM Mock_Interviews;
 --Company Preparation Status
 SELECT company_name,status
 FROM Companies;
+
+-- Topic Wise Problem Count
+SELECT topic, COUNT(*) AS Count
+FROM DSA_Problems
+GROUP BY topic;
