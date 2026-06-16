@@ -591,12 +591,15 @@ stat_avg_score.grid(row=2, column=0, sticky="w", padx=10, pady=8)
 stat_difficulty = ttk.Label(stats_frame, text="Difficulty Breakdown: -", font=("Segoe UI", 11))
 stat_difficulty.grid(row=3, column=0, sticky="w", padx=10, pady=8)
 
+stat_topic_wise = ttk.Label(stats_frame, text="Topic-wise Count: -", font=("Segoe UI", 11))
+stat_topic_wise.grid(row=4, column=0, sticky="w", padx=10, pady=8)
 
 def refresh_analytics():
     total = total_problems_solved(USER_ID)
     sql_completed = completed_sql_topics(USER_ID)
     avg_score = average_mock_score(USER_ID)
     diff_dist = difficulty_distribution(USER_ID)
+    topic_dist = topic_wise_count(USER_ID)
 
     stat_total_problems.config(text=f"Total Problems Solved: {total}")
     stat_sql_completed.config(text=f"Completed SQL Topics: {sql_completed}")
@@ -605,8 +608,11 @@ def refresh_analytics():
     diff_text = ", ".join([f"{d}: {c}" for d, c in diff_dist]) if diff_dist else "No data yet"
     stat_difficulty.config(text=f"Difficulty Breakdown: {diff_text}")
 
+    topic_text = ", ".join([f"{t}: {c}" for t, c in topic_dist]) if topic_dist else "No data yet"
+    stat_topic_wise.config(text=f"Topic-wise Count: {topic_text}")
 
-ttk.Button(stats_frame, text="Refresh Stats", command=refresh_analytics).grid(row=4, column=0, sticky="w", padx=10, pady=10)
+
+ttk.Button(stats_frame, text="Refresh Stats", command=refresh_analytics).grid(row=5, column=0, sticky="w", padx=10, pady=10)
 
 # --- Charts frame ---
 charts_frame = ttk.LabelFrame(analytics_tab, text="Visualizations", padding=20)

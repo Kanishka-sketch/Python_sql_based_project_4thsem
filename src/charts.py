@@ -3,7 +3,9 @@ from analytics import difficulty_distribution, topic_wise_count
 
 
 def show_difficulty_pie_chart(user_id):
+    plt.close('all')   
     """Displays a pie chart of DSA problems by difficulty."""
+    print("Pie button clicked")
     data = difficulty_distribution(user_id)
 
     if not data:
@@ -20,6 +22,8 @@ def show_difficulty_pie_chart(user_id):
 
 
 def show_topic_bar_chart(user_id):
+    plt.close('all')   
+    print("Bar button clicked")
     """Displays a bar chart of DSA problems by topic."""
     data = topic_wise_count(user_id)
 
