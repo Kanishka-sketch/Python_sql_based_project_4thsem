@@ -135,7 +135,7 @@ The application connects to `localhost\SQLEXPRESS` using Windows Authentication 
 
 ### Mock Interview Tracker
 
-![Mock Interview Tracker](screenshots\mock_interview_tracker.png)
+![Mock Interview Tracker](screenshots/mock_interview_tracker.png)
 
 ### Analytics Dashboard
 
