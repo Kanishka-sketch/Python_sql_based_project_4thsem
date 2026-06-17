@@ -569,209 +569,66 @@ refresh_mock_table()
 #===============================================
 from analytics import (total_problems_solved, difficulty_distribution,
                         topic_wise_count, completed_sql_topics, average_mock_score)
-from charts import create_difficulty_pie_figure, create_topic_bar_figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from charts import show_difficulty_pie_chart, show_topic_bar_chart
 
 # ============ ANALYTICS & CHARTS TAB ============
 
-ttk.Label(
-    analytics_tab,
-    text="📊 Analytics Dashboard",
-    font=("Segoe UI", 16, "bold")
-).pack(anchor="w", pady=(0, 15))
+ttk.Label(analytics_tab, text="Your Progress Summary", style="Heading.TLabel").pack(anchor="w", pady=(0, 15))
 
 # --- Stats display frame ---
-stats_frame = ttk.LabelFrame(
-    analytics_tab,
-    text="Statistics",
-    padding=20
-)
+stats_frame = ttk.LabelFrame(analytics_tab, text="Statistics", padding=20)
 stats_frame.pack(fill="x", pady=(0, 20))
 
-stat_total_problems = ttk.Label(
-    stats_frame,
-    text="📚 Total Problems Solved : -",
-    font=("Segoe UI", 12, "bold")
-)
+stat_total_problems = ttk.Label(stats_frame, text="Total Problems Solved: -", font=("Segoe UI", 11))
+stat_total_problems.grid(row=0, column=0, sticky="w", padx=10, pady=8)
 
-stat_sql_completed = ttk.Label(
-    stats_frame,
-    text="🗄️ Completed SQL Topics : -",
-    font=("Segoe UI", 12, "bold")
-)
+stat_sql_completed = ttk.Label(stats_frame, text="Completed SQL Topics: -", font=("Segoe UI", 11))
+stat_sql_completed.grid(row=1, column=0, sticky="w", padx=10, pady=8)
 
-stat_avg_score = ttk.Label(
-    stats_frame,
-    text="🎯 Average Mock Interview Score : -",
-    font=("Segoe UI", 12, "bold")
-)
+stat_avg_score = ttk.Label(stats_frame, text="Average Mock Interview Score: -", font=("Segoe UI", 11))
+stat_avg_score.grid(row=2, column=0, sticky="w", padx=10, pady=8)
 
-stat_difficulty = ttk.Label(
-    stats_frame,
-    text="📊 Difficulty Breakdown : -",
-    font=("Segoe UI", 12, "bold")
-)
+stat_difficulty = ttk.Label(stats_frame, text="Difficulty Breakdown: -", font=("Segoe UI", 11))
+stat_difficulty.grid(row=3, column=0, sticky="w", padx=10, pady=8)
 
-stat_topic_wise = ttk.Label(
-    stats_frame,
-    text="📈 Topic-wise Count : -",
-    font=("Segoe UI", 12, "bold")
-)
-
-# IMPORTANT: PLACE LABELS IN FRAME
-
-stat_total_problems.grid(
-    row=0, column=0,
-    sticky="w",
-    padx=10,
-    pady=8
-)
-
-stat_sql_completed.grid(
-    row=1, column=0,
-    sticky="w",
-    padx=10,
-    pady=8
-)
-
-stat_avg_score.grid(
-    row=2, column=0,
-    sticky="w",
-    padx=10,
-    pady=8
-)
-
-stat_difficulty.grid(
-    row=3, column=0,
-    sticky="w",
-    padx=10,
-    pady=8
-)
-
-stat_topic_wise.grid(
-    row=4, column=0,
-    sticky="w",
-    padx=10,
-    pady=8
-)
-
-# --- Charts frame ---
-ttk.Label(
-    analytics_tab,
-    text="📊 DSA Analytics Dashboard",
-    font=("Segoe UI", 13, "bold")
-).pack(anchor="w", pady=(10, 10))
-
-charts_frame = ttk.LabelFrame(
-    analytics_tab,
-    text="Visualizations",
-    padding=20
-)
-charts_frame.pack(fill="both", expand=True)
-
-pie_container = ttk.Frame(charts_frame)
-pie_container.pack(side="left", fill="both", expand=True, padx=10)
-
-bar_container = ttk.Frame(charts_frame)
-bar_container.pack(side="left", fill="both", expand=True, padx=10)
-
-current_pie_canvas = None
-current_bar_canvas = None
+stat_topic_wise = ttk.Label(stats_frame, text="Topic-wise Count: -", font=("Segoe UI", 11))
+stat_topic_wise.grid(row=4, column=0, sticky="w", padx=10, pady=8)
 
 def refresh_analytics():
-
-    global current_pie_canvas
-    global current_bar_canvas
-
     total = total_problems_solved(USER_ID)
     sql_completed = completed_sql_topics(USER_ID)
     avg_score = average_mock_score(USER_ID)
-
     diff_dist = difficulty_distribution(USER_ID)
     topic_dist = topic_wise_count(USER_ID)
 
-    stat_total_problems.config(
-        text=f"📚 Total Problems Solved : {total}"
-    )
+    stat_total_problems.config(text=f"Total Problems Solved: {total}")
+    stat_sql_completed.config(text=f"Completed SQL Topics: {sql_completed}")
+    stat_avg_score.config(text=f"Average Mock Interview Score: {avg_score:.1f}")
 
-    stat_sql_completed.config(
-        text=f"Completed SQL Topics : {sql_completed}"
-    )
+    diff_text = ", ".join([f"{d}: {c}" for d, c in diff_dist]) if diff_dist else "No data yet"
+    stat_difficulty.config(text=f"Difficulty Breakdown: {diff_text}")
 
-    stat_avg_score.config(
-        text=f"🎯 Average Mock Interview Score : {avg_score:.1f}"
-    )
-
-    diff_text = (
-        ", ".join([f"{d}: {c}" for d, c in diff_dist])
-        if diff_dist else "No data yet"
-    )
-
-    stat_difficulty.config(
-        text=f"📊 Difficulty Breakdown : {diff_text}"
-    )
-
-    topic_text = (
-        ", ".join([f"{t}: {c}" for t, c in topic_dist])
-        if topic_dist else "No data yet"
-    )
-
-    stat_topic_wise.config(
-        text=f"📈 Topic-wise Count : {topic_text}"
-    )
-
-    # Remove old charts
-
-    if current_pie_canvas:
-        current_pie_canvas.get_tk_widget().destroy()
-
-    if current_bar_canvas:
-        current_bar_canvas.get_tk_widget().destroy()
-
-    # Pie Chart
-
-    pie_fig = create_difficulty_pie_figure(USER_ID)
-
-    current_pie_canvas = FigureCanvasTkAgg(
-        pie_fig,
-        master=pie_container
-    )
-
-    current_pie_canvas.draw()
-
-    current_pie_canvas.get_tk_widget().pack(
-        fill="both",
-        expand=True
-    )
-
-    # Bar Chart
-
-    bar_fig = create_topic_bar_figure(USER_ID)
-
-    current_bar_canvas = FigureCanvasTkAgg(
-        bar_fig,
-        master=bar_container
-    )
-
-    current_bar_canvas.draw()
-
-    current_bar_canvas.get_tk_widget().pack(
-        fill="both",
-        expand=True
-    )
+    topic_text = ", ".join([f"{t}: {c}" for t, c in topic_dist]) if topic_dist else "No data yet"
+    stat_topic_wise.config(text=f"Topic-wise Count: {topic_text}")
 
 
-ttk.Button(
-    stats_frame,
-    text="Refresh Stats",
-    command=refresh_analytics
-).grid(
-    row=5,
-    column=0,
-    sticky="w",
-    padx=10,
-    pady=10
-)
+ttk.Button(stats_frame, text="Refresh Stats", command=refresh_analytics).grid(row=5, column=0, sticky="w", padx=10, pady=10)
+
+# --- Charts frame ---
+charts_frame = ttk.LabelFrame(analytics_tab, text="Visualizations", padding=20)
+charts_frame.pack(fill="x")
+
+ttk.Label(charts_frame, text="Click a button below to open a chart in a new window:",
+          font=("Segoe UI", 10)).pack(anchor="w", pady=(0, 10))
+
+chart_button_frame = ttk.Frame(charts_frame)
+chart_button_frame.pack(anchor="w")
+
+ttk.Button(chart_button_frame, text="Show Difficulty Pie Chart",
+           command=lambda: show_difficulty_pie_chart(USER_ID)).pack(side="left", padx=5)
+
+ttk.Button(chart_button_frame, text="Show Topic-wise Bar Chart",
+           command=lambda: show_topic_bar_chart(USER_ID)).pack(side="left", padx=5)
 
 # Load stats on startup
 refresh_analytics()
